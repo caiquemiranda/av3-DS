@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Autenticação simples com credenciais fixas
     if (email === 'usuario@exemplo.com' && senha === 'senha123') {
-      localStorage.setItem('autenticado', 'true');
+      login();
       navigate('/home');
     } else {
       alert('Credenciais inválidas!');

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 
 function PrivateRoute({ children }) {
-  const autenticado = localStorage.getItem('autenticado');
+  const { autenticado } = useContext(AuthContext);
 
   return autenticado ? children : <Navigate to="/" />;
 }

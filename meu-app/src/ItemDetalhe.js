@@ -1,22 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getItemById } from './services/api';
+import { AuthContext } from './AuthContext';
 
 function ItemDetalhe() {
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
 
   useEffect(() => {
-    getItemById(id).then((data) => {
-      if (data) {
-        setItem(data);
-      } else {
-        alert('Item não encontrado!');
-        navigate('/home');
-      }
-    });
-  }, [id, navigate]);
+    getItemById(id)
+      .then((data) => {
+        if (data) {
+          setItem(data);
+        } else {
+          alert('Item não encontrado!');
+          navigate('/home');
+        }
+      })
+      .catch((error) => {
+        if (error === 'Unauthorized') {
+          alert('Acesso não autorizado!');
+          logout();
+          navigate('/');
+        }
+      });
+  }, [id, navigate, logout]);
 
   if (!item) {
     return <div>Carregando...</div>;
