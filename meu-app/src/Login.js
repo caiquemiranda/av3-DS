@@ -1,6 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -19,30 +23,46 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label><br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Senha:</label><br />
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Entrar</button>
-      </form>
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: 8,
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        Login
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Senha"
+          type="password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Entrar
+        </Button>
+      </Box>
+    </Box>
   );
 }
 

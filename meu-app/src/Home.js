@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getDados } from './services/api';
 import { AuthContext } from './AuthContext';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import { Link as RouterLink } from 'react-router-dom';
 
 function Home() {
   const [itens, setItens] = useState([]);
@@ -28,21 +35,38 @@ function Home() {
   };
 
   return (
-    <div>
-      <h2>Página Home</h2>
-      <button onClick={handleLogout}>Sair</button>
-      <h3>Lista de Itens</h3>
-      <Link to="/novo-item">
-        <button>Adicionar Novo Item</button>
-      </Link>
-      <ul>
+    <Box sx={{ marginTop: 4, marginLeft: 2, marginRight: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Página Home
+      </Typography>
+      <Button variant="contained" color="secondary" onClick={handleLogout}>
+        Sair
+      </Button>
+      <Typography variant="h5" gutterBottom sx={{ marginTop: 2 }}>
+        Lista de Itens
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        component={RouterLink}
+        to="/novo-item"
+        sx={{ marginBottom: 2 }}
+      >
+        Adicionar Novo Item
+      </Button>
+      <List>
         {itens.map((item) => (
-          <li key={item.id}>
-            <Link to={`/item/${item.id}`}>{item.nome}</Link>
-          </li>
+          <ListItem
+            key={item.id}
+            button
+            component={RouterLink}
+            to={`/item/${item.id}`}
+          >
+            <ListItemText primary={item.nome} />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 }
 
