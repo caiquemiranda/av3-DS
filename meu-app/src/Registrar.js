@@ -1,27 +1,27 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { registrarUsuario } from './services/api';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 
-function Login() {
+function Registrar() {
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email.trim() === '' || senha.trim() === '') {
+    if (nome.trim() === '' || email.trim() === '' || senha.trim() === '') {
       alert('Todos os campos são obrigatórios.');
       return;
     }
-    login(email, senha)
+    registrarUsuario(nome, email, senha)
       .then(() => {
-        navigate('/home');
+        alert('Usuário registrado com sucesso! Você pode fazer login agora.');
+        navigate('/');
       })
       .catch((error) => {
         alert(error);
@@ -38,9 +38,17 @@ function Login() {
       }}
     >
       <Typography component="h1" variant="h5">
-        Login
+        Registrar
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Nome"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+        />
         <TextField
           margin="normal"
           required
@@ -65,14 +73,11 @@ function Login() {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Entrar
+          Registrar
         </Button>
-        <Link component={RouterLink} to="/registrar" variant="body2">
-          Não tem uma conta? Registre-se
-        </Link>
       </Box>
     </Box>
   );
 }
 
-export default Login;
+export default Registrar;

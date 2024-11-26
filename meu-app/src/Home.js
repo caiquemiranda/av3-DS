@@ -15,14 +15,14 @@ import Box from '@mui/material/Box';
 import { Link as RouterLink } from 'react-router-dom';
 
 function Home() {
-  const [itens, setItens] = useState([]);
+  const [receitas, setReceitas] = useState([]);
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
 
   useEffect(() => {
     getDados()
       .then((data) => {
-        setItens(data);
+        setReceitas(data);
       })
       .catch((error) => {
         if (error === 'Unauthorized') {
@@ -46,31 +46,39 @@ function Home() {
           component={RouterLink}
           to="/novo-item"
         >
-          Adicionar Novo Item
+          Adicionar Nova Receita
         </Button>
       </Box>
 
-      {/* Tabela de Itens */}
+      {/* REceitas */}
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="tabela de itens">
+        <Table sx={{ minWidth: 650 }} aria-label="tabela de receitas">
           <TableHead>
             <TableRow>
-              <TableCell align="center">ID</TableCell>
-              <TableCell align="center">Nome</TableCell>
+              <TableCell align="center" style={{ width: '10%' }}>
+                ID
+              </TableCell>
+              <TableCell align="center" style={{ width: '20%' }}>
+                Criador
+              </TableCell>
+              <TableCell align="center" style={{ width: '70%' }}>
+                Receita
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {itens.map((item) => (
+            {receitas.map((receita) => (
               <TableRow
-                key={item.id}
+                key={receita.id}
                 hover
                 sx={{ cursor: 'pointer' }}
-                onClick={() => navigate(`/item/${item.id}`)}
+                onClick={() => navigate(`/item/${receita.id}`)}
               >
                 <TableCell component="th" scope="row" align="center">
-                  {item.id}
+                  {receita.id}
                 </TableCell>
-                <TableCell align="center">{item.nome}</TableCell>
+                <TableCell align="center">{receita.criador}</TableCell>
+                <TableCell align="center">{receita.receita}</TableCell>
               </TableRow>
             ))}
           </TableBody>

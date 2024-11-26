@@ -8,19 +8,19 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 function NovoItem() {
-  const [nome, setNome] = useState('');
+  const [receita, setReceita] = useState('');
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
+  const { usuario, logout } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (nome.trim() === '') {
-      alert('O nome do item não pode ser vazio.');
+    if (receita.trim() === '') {
+      alert('O campo Receita é obrigatório.');
       return;
     }
-    adicionarItem(nome)
+    adicionarItem(usuario.id, usuario.nome, receita)
       .then(() => {
-        alert('Item adicionado com sucesso!');
+        alert('Receita adicionada com sucesso!');
         navigate('/home');
       })
       .catch((error) => {
@@ -28,6 +28,8 @@ function NovoItem() {
           alert('Acesso não autorizado!');
           logout();
           navigate('/');
+        } else {
+          alert(error);
         }
       });
   };
@@ -46,16 +48,16 @@ function NovoItem() {
       }}
     >
       <Typography component="h1" variant="h5">
-        Adicionar Novo Item
+        Adicionar Nova Receita
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
         <TextField
           margin="normal"
           required
           fullWidth
-          label="Nome do Item"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
+          label="Receita"
+          value={receita}
+          onChange={(e) => setReceita(e.target.value)}
         />
         <Button
           type="submit"

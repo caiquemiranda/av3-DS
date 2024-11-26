@@ -9,17 +9,22 @@ import Typography from '@mui/material/Typography';
 
 function EditarItem() {
   const { id } = useParams();
-  const [nome, setNome] = useState('');
+  const [receita, setReceita] = useState('');
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
+  const { usuario, logout } = useContext(AuthContext);
 
   useEffect(() => {
     getItemById(id)
       .then((data) => {
         if (data) {
-          setNome(data.nome);
+          if (data.criadorId !== usuario.id) {
+            alert('Você não tem permissão para editar esta receita.');
+            navigate('/home');
+          } else {
+            setReceita(data.receita);
+          }
         } else {
-          alert('Item não encontrado!');
+          alert('Receita não encontrada!');
           navigate('/home');
         }
       })
@@ -28,19 +33,21 @@ function EditarItem() {
           alert('Acesso não autorizado!');
           logout();
           navigate('/');
+        } else {
+          alert(error);
         }
       });
-  }, [id, navigate, logout]);
+  }, [id, navigate, logout, usuario.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (nome.trim() === '') {
-      alert('O nome do item não pode ser vazio.');
+    if (receita.trim() === '') {
+      alert('O campo Receita é obrigatório.');
       return;
     }
-    atualizarItem(id, nome)
+    atualizarItem(id, usuario.id, usuario.nome, receita)
       .then(() => {
-        alert('Item atualizado com sucesso!');
+        alert('Receita atualizada com sucesso!');
         navigate('/home');
       })
       .catch((error) => {
@@ -48,6 +55,8 @@ function EditarItem() {
           alert('Acesso não autorizado!');
           logout();
           navigate('/');
+        } else {
+          alert(error);
         }
       });
   };
@@ -66,16 +75,16 @@ function EditarItem() {
       }}
     >
       <Typography component="h1" variant="h5">
-        Editar Item
+        Editar Receita
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
         <TextField
           margin="normal"
           required
           fullWidth
-          label="Nome do Item"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
+          label="Receita"
+          value={receita}
+          onChange={(e) => setReceita(e.target.value)}
         />
         <Button
           type="submit"

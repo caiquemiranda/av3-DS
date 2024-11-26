@@ -1,6 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Login';
+import Registrar from './Registrar';
 import Home from './Home';
 import PrivateRoute from './PrivateRoute';
 import ItemDetalhe from './ItemDetalhe';
@@ -30,28 +31,39 @@ function App() {
       <ThemeProvider theme={theme}>
         <Router>
           <div>
-            <AppBar position="static">
-              <Toolbar>
-                <AuthContext.Consumer>
-                  {({ autenticado, logout }) =>
-                    autenticado && (
-                      <Button color="inherit" onClick={logout}>
-                        Sair
-                      </Button>
-                    )
-                  }
-                </AuthContext.Consumer>
-                <Typography
-                  variant="h6"
-                  component="div"
-                  sx={{ flexGrow: 1, textAlign: 'center' }}
-                >
-                  Meu Aplicativo React
-                </Typography>
-              </Toolbar>
-            </AppBar>
+            <AuthContext.Consumer>
+              {({ usuario, logout }) => (
+                <AppBar position="static">
+                  <Toolbar>
+                    {usuario ? (
+                      <>
+                        <Button color="inherit" onClick={logout}>
+                          Sair
+                        </Button>
+                        <Typography
+                          variant="h6"
+                          component="div"
+                          sx={{ flexGrow: 1, textAlign: 'center' }}
+                        >
+                          Olá, {usuario.nome}
+                        </Typography>
+                      </>
+                    ) : (
+                      <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{ flexGrow: 1, textAlign: 'center' }}
+                      >
+                        Meu Aplicativo de Receitas
+                      </Typography>
+                    )}
+                  </Toolbar>
+                </AppBar>
+              )}
+            </AuthContext.Consumer>
             <Routes>
               <Route path="/" element={<Login />} />
+              <Route path="/registrar" element={<Registrar />} />
               <Route
                 path="/home"
                 element={

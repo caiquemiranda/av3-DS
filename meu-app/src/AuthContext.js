@@ -1,24 +1,32 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { loginUsuario, logoutUsuario } from './services/api';
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [autenticado, setAutenticado] = useState(
-    !!localStorage.getItem('token')
-  );
+  const [usuario, setUsuario] = useState(null);
 
-  const login = () => {
-    setAutenticado(true);
-    localStorage.setItem('token', 'meuTokenSecreto');
+  useEffect(() => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      setUsuario(JSON.parse(userJson));
+    }
+  }, []);
+
+  const login = (email, senha) => {
+    return loginUsuario(email, senha).then((user) => {
+      setUsuario(user);
+      return user;
+    });
   };
 
   const logout = () => {
-    setAutenticado(false);
-    localStorage.removeItem('token');
+    logoutUsuario();
+    setUsuario(null);
   };
 
   return (
-    <AuthContext.Provider value={{ autenticado, login, logout }}>
+    <AuthContext.Provider value={{ usuario, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
