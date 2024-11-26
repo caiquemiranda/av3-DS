@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Login';
 import Home from './Home';
@@ -6,13 +6,12 @@ import PrivateRoute from './PrivateRoute';
 import ItemDetalhe from './ItemDetalhe';
 import NovoItem from './NovoItem';
 import EditarItem from './EditarItem';
-import { AuthProvider } from './AuthContext';
+import { AuthProvider, AuthContext } from './AuthContext';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { Link as RouterLink } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
@@ -33,15 +32,22 @@ function App() {
           <div>
             <AppBar position="static">
               <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <AuthContext.Consumer>
+                  {({ autenticado, logout }) =>
+                    autenticado && (
+                      <Button color="inherit" onClick={logout}>
+                        Sair
+                      </Button>
+                    )
+                  }
+                </AuthContext.Consumer>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ flexGrow: 1, textAlign: 'center' }}
+                >
                   Meu Aplicativo React
                 </Typography>
-                <Button color="inherit" component={RouterLink} to="/">
-                  Login
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/home">
-                  Home
-                </Button>
               </Toolbar>
             </AppBar>
             <Routes>

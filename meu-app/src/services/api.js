@@ -1,6 +1,6 @@
 let dados = [
-  { id: 1, nome: 'Item 1' },
-  { id: 2, nome: 'Item 2' },
+  { id: 1, nome: 'Marcelo' },
+  { id: 2, nome: 'Sara' },
   { id: 3, nome: 'Item 3' },
 ];
 
