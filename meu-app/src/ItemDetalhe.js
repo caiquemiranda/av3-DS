@@ -1,81 +1,54 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getItemById, deletarItem } from './services/api';
-import { AuthContext } from './AuthContext';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+import React, { useState, useEffect, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getItemById, excluirReceita } from "./services/api";
+import { AuthContext } from "./AuthContext";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 function ItemDetalhe() {
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const navigate = useNavigate();
-  const { usuario, logout } = useContext(AuthContext);
+  const { usuario } = useContext(AuthContext);
 
   useEffect(() => {
-    getItemById(id)
-      .then((data) => {
-        if (data) {
-          setItem(data);
-        } else {
-          alert('Receita não encontrada!');
-          navigate('/home');
-        }
-      })
-      .catch((error) => {
-        if (error === 'Unauthorized') {
-          alert('Acesso não autorizado!');
-          logout();
-          navigate('/');
-        } else {
-          alert(error);
-        }
-      });
-  }, [id, navigate, logout]);
+    const fetchData = async () => {
+      try {
+        const receita = await getItemById(id);
+        setItem(receita);
+      } catch (error) {
+        alert(error.message);
+        navigate("/home");
+      }
+    };
+    fetchData();
+  }, [id, navigate]);
 
-  if (!item) {
-    return <div>Carregando...</div>;
-  }
-
-  const handleVoltar = () => {
-    navigate('/home');
+  const handleExcluir = async () => {
+    try {
+      await excluirReceita(item.id, usuario.id);
+      alert("Receita excluída com sucesso!");
+      navigate("/home");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handleEditar = () => {
-    navigate(`/editar-item/${item.id}`);
-  };
-
-  const handleDeletar = () => {
-    deletarItem(item.id, usuario.id)
-      .then(() => {
-        alert('Receita deletada com sucesso!');
-        navigate('/home');
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
+  if (!item) return <div>Carregando...</div>;
 
   return (
     <Box sx={{ marginTop: 4, marginLeft: 2, marginRight: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Detalhes da Receita
-      </Typography>
-      <Typography variant="body1">
-        <strong>ID:</strong> {item.id}
-      </Typography>
-      <Typography variant="body1">
-        <strong>Criador:</strong> {item.criador}
-      </Typography>
+      <Typography variant="h5">{item.titulo}</Typography>
       <Typography variant="body1" gutterBottom>
-        <strong>Receita:</strong> {item.receita}
+        {item.descricao}
       </Typography>
-      {item.criadorId === usuario.id && (
+      {item.autorId === usuario.id && (
         <>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleEditar}
+            onClick={() => navigate(`/editar-item/${item.id}`)}
             sx={{ marginRight: 2 }}
           >
             Editar Receita
@@ -83,14 +56,13 @@ function ItemDetalhe() {
           <Button
             variant="contained"
             color="secondary"
-            onClick={handleDeletar}
-            sx={{ marginRight: 2 }}
+            onClick={handleExcluir}
           >
-            Deletar Receita
+            Excluir Receita
           </Button>
         </>
       )}
-      <Button variant="outlined" onClick={handleVoltar}>
+      <Button variant="outlined" onClick={() => navigate("/home")}>
         Voltar
       </Button>
     </Box>

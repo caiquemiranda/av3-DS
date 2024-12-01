@@ -1,63 +1,67 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adicionarItem } from './services/api';
-import { AuthContext } from './AuthContext';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { adicionarReceita } from "./services/api";
+import { AuthContext } from "./AuthContext";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 function NovoItem() {
-  const [receita, setReceita] = useState('');
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
   const navigate = useNavigate();
-  const { usuario, logout } = useContext(AuthContext);
+  const { usuario } = useContext(AuthContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (receita.trim() === '') {
-      alert('O campo Receita é obrigatório.');
+    if (!titulo || !descricao) {
+      alert("Todos os campos são obrigatórios.");
       return;
     }
-    adicionarItem(usuario.id, usuario.nome, receita)
-      .then(() => {
-        alert('Receita adicionada com sucesso!');
-        navigate('/home');
-      })
-      .catch((error) => {
-        if (error === 'Unauthorized') {
-          alert('Acesso não autorizado!');
-          logout();
-          navigate('/');
-        } else {
-          alert(error);
-        }
-      });
-  };
-
-  const handleCancel = () => {
-    navigate('/home');
+    try {
+      await adicionarReceita(usuario.id, usuario.nome, titulo, descricao);
+      alert("Receita adicionada com sucesso!");
+      navigate("/home");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginTop: 8
       }}
     >
       <Typography component="h1" variant="h5">
         Adicionar Nova Receita
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ mt: 1, width: "300px" }}
+      >
         <TextField
           margin="normal"
           required
           fullWidth
-          label="Receita"
-          value={receita}
-          onChange={(e) => setReceita(e.target.value)}
+          label="Título"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Descrição"
+          multiline
+          rows={4}
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
         />
         <Button
           type="submit"
@@ -66,13 +70,6 @@ function NovoItem() {
           sx={{ mt: 3, mb: 2 }}
         >
           Adicionar
-        </Button>
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleCancel}
-        >
-          Cancelar
         </Button>
       </Box>
     </Box>
