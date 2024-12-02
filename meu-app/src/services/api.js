@@ -1,110 +1,64 @@
-// Dados simulados de usuários
-let usuarios = [
-  { id: 1, nome: "João", email: "joao@example.com", senha: "123456" },
-  { id: 2, nome: "Maria", email: "maria@example.com", senha: "123456" },
-];
+// db firebase
 
-// Dados simulados de receitas
-let receitas = [
-  {
-    id: 1,
-    autorId: 1,
-    autor: "João",
-    titulo: "Bolo de Chocolate",
-    descricao: "Um bolo delicioso feito com chocolate amargo.",
-  },
-  {
-    id: 2,
-    autorId: 2,
-    autor: "Maria",
-    titulo: "Torta de Limão",
-    descricao: "Uma torta refrescante com base crocante e recheio cremoso.",
-  },
-];
+import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "../firebase";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 
-// Simular autenticação
-const isAuthenticated = () => !!localStorage.getItem("token");
-
-//usuário autenticado
-const getAuthenticatedUser = () => {
-  const userJson = localStorage.getItem("user");
-  return userJson ? JSON.parse(userJson) : null;
+// Registrar usuário
+export const registrarUsuario = async (email, senha) => {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+  return userCredential.user;
 };
 
-//registrar um novo usuário
-export const registrarUsuario = async (nome, email, senha) => {
-  const usuarioExistente = usuarios.find((u) => u.email === email);
-  if (usuarioExistente) {
-    throw new Error("Email já está em uso.");
-  }
-  const novoUsuario = { id: usuarios.length + 1, nome, email, senha };
-  usuarios.push(novoUsuario);
-  return novoUsuario;
-};
-
-//login de usuário
+// Login de usuário
 export const loginUsuario = async (email, senha) => {
-  const usuario = usuarios.find((u) => u.email === email && u.senha === senha);
-  if (!usuario) {
-    throw new Error("Credenciais inválidas.");
-  }
-  localStorage.setItem("token", "meuTokenSecreto");
-  localStorage.setItem("user", JSON.stringify(usuario));
-  return usuario;
+  const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+  return userCredential.user;
 };
 
-// Função logout de usuário
-export const logoutUsuario = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+// Logout de usuário
+export const logoutUsuario = async () => {
+  await signOut(auth);
 };
 
-// Adicionar Receit
+// Adicionar Receita
 export const adicionarReceita = async (autorId, autor, titulo, descricao) => {
-  const novaReceita = {
-    id: receitas.length + 1,
+  const docRef = await addDoc(collection(db, "receitas"), {
     autorId,
     autor,
     titulo,
     descricao,
-  };
-  receitas.push(novaReceita);
-  return novaReceita;
+  });
+  return { id: docRef.id, autorId, autor, titulo, descricao };
 };
 
-// Atualizar
-export const atualizarReceita = async (id, autorId, titulo, descricao) => {
-  const index = receitas.findIndex((r) => r.id === parseInt(id));
-  if (index !== -1) {
-    if (receitas[index].autorId !== autorId) {
-      throw new Error("Você não tem permissão para editar esta receita.");
-    }
-    receitas[index].titulo = titulo;
-    receitas[index].descricao = descricao;
-    return receitas[index];
-  }
-  throw new Error("Receita não encontrada.");
+// Listar Receitas
+export const listarReceitas = async () => {
+  const querySnapshot = await getDocs(collection(db, "receitas"));
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 };
 
-// Listar
-export const listarReceitas = async () => receitas;
-
-// Obter Receita ID
+// Obter Receita por ID
 export const getItemById = async (id) => {
-  const receita = receitas.find((r) => r.id === parseInt(id));
-  if (!receita) throw new Error("Receita não encontrada.");
-  return receita;
+  const docRef = doc(db, "receitas", id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { id, ...docSnap.data() };
+  } else {
+    throw new Error("Receita não encontrada.");
+  }
 };
 
-// Excluir
-export const excluirReceita = async (id, autorId) => {
-  const index = receitas.findIndex((r) => r.id === parseInt(id));
-  if (index !== -1) {
-    if (receitas[index].autorId !== autorId) {
-      throw new Error("Você não tem permissão para excluir esta receita.");
-    }
-    receitas.splice(index, 1);
-    return true;
-  }
-  throw new Error("Receita não encontrada.");
+// Atualizar Receita
+export const atualizarReceita = async (id, dados) => {
+  const docRef = doc(db, "receitas", id);
+  await updateDoc(docRef, dados);
+};
+
+// Excluir Receita
+export const excluirReceita = async (id) => {
+  const docRef = doc(db, "receitas", id);
+  await deleteDoc(docRef);
 };

@@ -20,7 +20,7 @@ function NovoItem() {
       return;
     }
     try {
-      await adicionarReceita(usuario.id, usuario.nome, titulo, descricao);
+      await adicionarReceita(usuario.uid, usuario.email, titulo, descricao);
       alert("Receita adicionada com sucesso!");
       navigate("/home");
     } catch (error) {
@@ -34,7 +34,7 @@ function NovoItem() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        marginTop: 8
+        marginTop: 8,
       }}
     >
       <Typography component="h1" variant="h5">
